@@ -16,10 +16,12 @@ import os
 import sys
 import pandas as pd
 
+
 def identifyFileType(filepath):
     file = os.path.basename(filepath)
     fileName, typeName = os.path.splitext(file)
     return typeName
+
 
 def identifySep(filepath, tableType):
     if "xls" in tableType: 
@@ -31,11 +33,13 @@ def identifySep(filepath, tableType):
         elif ' ' in firstLine: return ' '
         elif '|' in firstLine: return '|'
 
+
 def openTable(filepath, tableSep):
     if tableSep == "":
         return pd.read_excel(filepath)
     else:
         return pd.read_csv(filepath, sep=tableSep)
+
 
 def multiJoin(tableDFList):
     while len(tableDFList) > 1:
@@ -45,6 +49,7 @@ def multiJoin(tableDFList):
     else:
         joinedTable = eval(tableDFList[0])
     return joinedTable
+
 
 def doStatistic(joinedTable):
 
