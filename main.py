@@ -4,7 +4,7 @@
 # Author: Bob Lee
 # https://github.com/bobleer/Multi_Tables_Join
 '''
-多Table Join小脚本
+多 Table Join 小脚本
 使用前请确保:
 0. 已安装 Pandas
 1. 每个表格的第一行是列名
@@ -16,7 +16,6 @@ import os
 import sys
 import pandas as pd
 
-
 def identifyFileType(filepath):
     file = os.path.basename(filepath)
     fileName, typeName = os.path.splitext(file)
@@ -26,10 +25,17 @@ def identifySep(filepath, tableType):
     if "xls" in tableType: 
         return ""
     else:
-        open(resultlist[0],'r').readline().strip()
+        firstLine = open(filepath, 'r').readline().strip()
+        if '\t' in firstLine: return "\t"
+        elif ',' in firstLine: return ','
+        elif ' ' in firstLine: return ' '
+        elif '|' in firstLine: return '|'
 
-
-def openTable():
+def openTable(filepath, tableSep):
+    if tableSep == "":
+        return pd.read_excel(filepath)
+    else:
+        return pd.read_csv(filepath, sep=tableSep)
 
 def multiJoin(tableDFList):
     while len(tableDFList) > 1:
@@ -44,7 +50,7 @@ def doStatistic(joinedTable):
 
     return statisticInfo
 
-# 输入多个Tables并打开
+# 输入多个Tables路径并打开
 tableListInput = [i.strip() for i in sys.argv[1:]][::-1]
 tableDFList = []
 for index, filepath in enumerate(tableListInput):
