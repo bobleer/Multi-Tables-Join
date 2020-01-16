@@ -59,10 +59,10 @@ def originalTbalesStatistic(joinedTable, tableDFList):
     everyColumnDistinctCount = []
     for index, i in enumerate(tableDFList[::-1]):
         thisTbale = eval(i)
-        everyPrimaryColumnsDistinctCount = [thisTbale[k].drop_duplicates().shape[0] for k in primaryColumns]
+        everyPrimaryColumnsDistinctCount = ["%s: %s"%(k, thisTbale[k].drop_duplicates().shape[0]) for k in primaryColumns]
         specialColumns = [j for j in thisTbale.columns if j not in primaryColumns]
-        everySpecialColumnsDistinctCount = [thisTbale[k].drop_duplicates().shape[0] for k in specialColumns]
-        everyColumnDistinctCount.append("\t".join(map(str,everyPrimaryColumnsDistinctCount+['']*index+everySpecialColumnsDistinctCount)))
+        everySpecialColumnsDistinctCount = ["%s: %s"%(k, thisTbale[k].drop_duplicates().shape[0]) for k in specialColumns]
+        everyColumnDistinctCount.append("\t".join(map(str,[thisTbale.shape[0]]+everyPrimaryColumnsDistinctCount+['']*index*len(everySpecialColumnsDistinctCount)+everySpecialColumnsDistinctCount)))
     return "\n".join(everyColumnDistinctCount)
 
 
