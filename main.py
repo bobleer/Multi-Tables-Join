@@ -52,10 +52,12 @@ def multiJoin(tableDFList):
     return joinedTable
 
 
-def originalTbalesStatistic(joinedTable, tableDFList):
-    
+def getPrimaryColumns(tableDFList, joinedTable):
     allColumns = sum([eval(i).columns.to_list() for i in tableDFList],[])
     primaryColumns = [i for i in joinedTable.columns if allColumns.count(i) > 1]
+    return primaryColumns
+
+def originalTbalesStatistic(tableDFList, primaryColumns):
     everyColumnDistinctCount = []
     for index, i in enumerate(tableDFList[::-1]):
         thisTbale = eval(i)
@@ -86,11 +88,15 @@ for index, filepath in enumerate(tableListInput):
 tableDFList_bak = deepcopy(tableDFList)
 joinedTable = multiJoin(tableDFList)
 
+# 空值转NULL && 根据SpecialColumns排序
+primaryColumns = getPrimaryColumns(tableDFList_bak, joinedTable)
+joinedTable_ordered = joinedTable.fillna(value="NULL").sort_values(by=[i for i in joinedTable.columns.to_list()[::-1] if i not in primaryColumns], ascending=False).reset_index(drop=True)
+
 # 生成统计信息
-statisticInfo = originalTbalesStatistic(joinedTable, tableDFList_bak) + '\n\n' + joinedTableStatistic(joinedTable)
+statisticInfo = originalTbalesStatistic(tableDFList_bak, primaryColumns) + '\n\n' + joinedTableStatistic(joinedTable_ordered)
 
 # 结合统计信息&最终表
-combinedAll = statisticInfo + "\n" + joinedTable.to_csv(sep="\t")
+combinedAll = statisticInfo + "\n" + joinedTable_ordered.to_csv(sep="\t")
 
 # 输出
 print(combinedAll)
