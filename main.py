@@ -15,6 +15,7 @@
 import os
 import sys
 import pandas as pd
+from copy import deepcopy
 
 
 def identifyFileType(filepath):
@@ -51,9 +52,25 @@ def multiJoin(tableDFList):
     return joinedTable
 
 
-def doStatistic(joinedTable):
+def originalTbalesStatistic(joinedTable, tableDFList):
+    
+    allColumns = sum([eval(i).columns.to_list() for i in tableDFList],[])
+    primaryColumns = [i for i in joinedTable.columns if allColumns.count(i) > 1]
+    everyColumnDistinctCount = []
+    for index, i in enumerate(tableDFList[::-1]):
+        thisTbale = eval(i)
+        everyPrimaryColumnsDistinctCount = [thisTbale[k].drop_duplicates().shape[0] for k in primaryColumns]
+        specialColumns = [j for j in thisTbale.columns if j not in primaryColumns]
+        everySpecialColumnsDistinctCount = [thisTbale[k].drop_duplicates().shape[0] for k in specialColumns]
+        everyColumnDistinctCount.append("\t".join(map(str,everyPrimaryColumnsDistinctCount+['']*index+everySpecialColumnsDistinctCount)))
+    return "\n".join(everyColumnDistinctCount)
 
-    return statisticInfo
+
+def joinedTableStatistic(joinedTable):
+    countAllTable = joinedTable.shape[0]
+    everyColumnDistinctCount = [countAllTable]+[joinedTable[i].drop_duplicates().shape[0] for i in joinedTable.columns]
+    return "\t".join(map(str,everyColumnDistinctCount))
+
 
 # 输入多个Tables路径并打开
 tableListInput = [i.strip() for i in sys.argv[1:]][::-1]
@@ -66,13 +83,14 @@ for index, filepath in enumerate(tableListInput):
     locals()[varName] = openTable(filepath, tableSep)
 
 # 合并多个Tables
+tableDFList_bak = deepcopy(tableDFList)
 joinedTable = multiJoin(tableDFList)
 
 # 生成统计信息
-statisticInfo = doStatistic(joinedTable)
+statisticInfo = originalTbalesStatistic(joinedTable, tableDFList_bak) + '\n\n' + joinedTableStatistic(joinedTable)
 
 # 结合统计信息&最终表
-combinedAll = statisticInfo + joinedTable.to_csv(sep="\t")
+combinedAll = statisticInfo + "\n" + joinedTable.to_csv(sep="\t")
 
 # 输出
 print(combinedAll)
