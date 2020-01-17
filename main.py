@@ -58,24 +58,28 @@ def getPrimaryColumns(tableDFList, joinedTable):
     primaryColumns = [i for i in joinedTable.columns if allColumns.count(i) > 1]
     return primaryColumns
 
-def originalTbalesStatistic(tableDFList, primaryColumns):
-    everyColumnDistinctCount = []
-    for index, i in enumerate(tableDFList[::-1]):
-        thisTbale = eval(i)
-        everyPrimaryColumnsDistinctCount = ["%s: %s"%(k, thisTbale[k].drop_duplicates().shape[0]) for k in primaryColumns]
-        specialColumns = [j for j in thisTbale.columns if j not in primaryColumns]
-        everySpecialColumnsDistinctCount = ["%s: %s"%(k, thisTbale[k].drop_duplicates().shape[0]) for k in specialColumns]
-        everyColumnDistinctCount.append("\t".join(map(str,[thisTbale.shape[0]]+everyPrimaryColumnsDistinctCount+['']*index*len(everySpecialColumnsDistinctCount)+everySpecialColumnsDistinctCount)))
-    return "\n".join(everyColumnDistinctCount)
+def originalTbalesStatistic(tableDFList, joinedTable):
+    originalColumnDistinctCount = []
+    for index, table in enumerate(tableDFList[::-1]):
+        thisTable = eval(table)
+        thisTableStatistic = []
+        for column in joinedTable.columns:
+            try:
+                thisTableStatistic.append("%s: %s"%(column,thisTable[column].drop_duplicates().shape[0]))
+            except:
+                thisTableStatistic.append("")
+        originalColumnDistinctCount.append("\t".join(map(str,[thisTable.shape[0]]+thisTableStatistic)))
+
+    return "\n".join(originalColumnDistinctCount)
 
 
 def joinedTableStatistic(joinedTable):
     countAllTable = joinedTable.shape[0]
-    everyColumnDistinctCount = [countAllTable]+[joinedTable[i].drop_duplicates().shape[0] for i in joinedTable.columns]
-    return "\t".join(map(str,everyColumnDistinctCount))
+    joinedColumnDistinctCount = [countAllTable]+[joinedTable[i].drop_duplicates().shape[0] for i in joinedTable.columns]
+    return "\t".join(map(str,joinedColumnDistinctCount))
 
 
-# 输入多个Tables路径并打开
+# 输入多个Tables路径 && 检查文件类型 && 判断分隔符 && 打开文件
 tableListInput = [i.strip() for i in sys.argv[1:]][::-1]
 tableDFList = []
 for index, filepath in enumerate(tableListInput):
@@ -89,14 +93,14 @@ for index, filepath in enumerate(tableListInput):
 tableDFList_bak = deepcopy(tableDFList)
 joinedTable = multiJoin(tableDFList)
 
-# 空值转NULL && 根据SpecialColumns排序
+# 空值转NULL && 根据SpecialColumns[::-1]倒序排序
 primaryColumns = getPrimaryColumns(tableDFList_bak, joinedTable)
 joinedTable_ordered = joinedTable.fillna(value="NULL").sort_values(by=[i for i in joinedTable.columns.to_list()[::-1] if i not in primaryColumns], ascending=False).reset_index(drop=True)
 
-# 生成统计信息
-statisticInfo = originalTbalesStatistic(tableDFList_bak, primaryColumns) + '\n\n' + joinedTableStatistic(joinedTable_ordered)
+# 生成每个表以及最终表的统计信息
+statisticInfo = originalTbalesStatistic(tableDFList_bak, joinedTable_ordered) + '\n\n' + joinedTableStatistic(joinedTable_ordered)
 
-# 结合统计信息&最终表
+# 合并统计信息和最终表结果
 combinedAll = statisticInfo + "\n" + joinedTable_ordered.to_csv(sep="\t")
 
 # 输出
