@@ -104,4 +104,4 @@ statisticInfo = originalTbalesStatistic(tableDFList_bak, joinedTable_ordered) + 
 combinedAll = statisticInfo + "\n" + joinedTable_ordered.to_csv(sep="\t")
 
 # 输出
-print(combinedAll)
+print(combinedAll.rstrip(),end='')
