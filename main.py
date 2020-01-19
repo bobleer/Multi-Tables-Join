@@ -3,7 +3,7 @@
 # Python Version: Python3
 # Author: Bob Lee
 # https://github.com/bobleer/Multi_Tables_Join
-# 2020-01-17 16:30:31
+# 2020-01-19 16:54:28
 '''
 多 Table Join 小脚本
 使用前请确保:
@@ -104,4 +104,4 @@ statisticInfo = originalTbalesStatistic(tableDFList_bak, joinedTable_ordered) + 
 combinedAll = statisticInfo + "\n" + joinedTable_ordered.to_csv(sep="\t")
 
 # 输出
-print(combinedAll.rstrip(),end='')
+print(combinedAll.rstrip(), end='')
