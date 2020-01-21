@@ -1,6 +1,7 @@
 # Multi_Tables_Join
-Automatically join multi tables by the same columns (like JOIN Function in SQL)
-
+Automatically join multi tables by the same columns (like JOIN Function in SQL), and generate statistics info.  
+![](https://github.com/bobleer/Multi_Tables_Join/blob/master/Multi_Tables_Join_demo.jpg?raw=true)
+  
 ## Features
 
 1. Multiple tables input | 支持输入多个表  
