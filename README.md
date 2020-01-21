@@ -12,4 +12,4 @@ Automatically join multi tables by the same columns (like JOIN Function in SQL)
   
 ## Preview
 
-
+![](https://raw.githubusercontent.com/bobleer/Multi_Tables_Join/master/Multi_Tables_Join.gif)
