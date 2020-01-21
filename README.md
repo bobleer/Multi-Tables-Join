@@ -9,3 +9,7 @@ Automatically join multi tables by the same columns (like JOIN Function in SQL)
 4. Join tables by the same columns by default | 默认根据多个表中的相同列合并  
 5. Outer Join by default | 默认采用 Outer Join  
 6. Generate statistics for each table by default | 默认输出每一个表每一列的统计信息（方便对比）  
+  
+## Preview
+
+
