@@ -50,6 +50,7 @@ def multiJoin(tableDFList):
         tableDFList.append("joinedTable")
     else:
         joinedTable = eval(tableDFList[0])
+
     return joinedTable
 
 
@@ -95,7 +96,11 @@ joinedTable = multiJoin(tableDFList)
 
 # 空值转NULL && 根据SpecialColumns[::-1]倒序排序
 primaryColumns = getPrimaryColumns(tableDFList_bak, joinedTable)
-joinedTable_ordered = joinedTable.fillna(value="NULL").sort_values(by=[i for i in joinedTable.columns.to_list()[::-1] if i not in primaryColumns], ascending=False).reset_index(drop=True)
+foreignColumns = [i for i in joinedTable.columns.to_list()[::-1] if i not in primaryColumns]
+if len(foreignColumns) != 0:
+    joinedTable_ordered = joinedTable.fillna(value="NULL").sort_values(by=foreignColumns, ascending=False).reset_index(drop=True)
+else:
+    joinedTable_ordered = joinedTable.fillna(value="NULL")
 
 # 生成每个表以及最终表的统计信息
 statisticInfo = originalTbalesStatistic(tableDFList_bak, joinedTable_ordered) + '\n\n' + joinedTableStatistic(joinedTable_ordered)
