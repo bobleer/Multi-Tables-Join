@@ -96,11 +96,11 @@ joinedTable = multiJoin(tableDFList)
 
 # 空值转NULL && 根据SpecialColumns[::-1]倒序排序
 primaryColumns = getPrimaryColumns(tableDFList_bak, joinedTable)
-foreignColumns = [i for i in joinedTable.columns.to_list()[::-1] if i not in primaryColumns]
+foreignColumns = [i for i in joinedTable.columns.to_list() if i not in primaryColumns]
 if len(foreignColumns) != 0:
-    joinedTable_ordered = joinedTable.fillna(value="NULL").sort_values(by=foreignColumns, ascending=False).reset_index(drop=True)
+    joinedTable_ordered = joinedTable.fillna(value="NULL").sort_values(by=foreignColumns[::-1], ascending=False).reset_index(drop=True)[list(primaryColumns+foreignColumns)]
 else:
-    joinedTable_ordered = joinedTable.fillna(value="NULL")
+    joinedTable_ordered = joinedTable.fillna(value="NULL")[list(primaryColumns+foreignColumns)]
 
 # 生成每个表以及最终表的统计信息
 statisticInfo = originalTbalesStatistic(tableDFList_bak, joinedTable_ordered) + '\n\n' + joinedTableStatistic(joinedTable_ordered)
