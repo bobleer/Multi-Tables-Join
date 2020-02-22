@@ -3,7 +3,7 @@
 # Python Version: Python3
 # Author: Bob Lee
 # https://github.com/bobleer/Multi_Tables_Join
-# 2020-01-19 16:54:28
+# 2020-02-22 21:53:04
 '''
 多 Table Join 小脚本
 使用前请确保:
@@ -17,6 +17,7 @@ import os
 import sys
 import pandas as pd
 from copy import deepcopy
+from functools import reduce
 
 
 def identifyFileType(filepath):
@@ -94,13 +95,16 @@ for index, filepath in enumerate(tableListInput):
 tableDFList_bak = deepcopy(tableDFList)
 joinedTable = multiJoin(tableDFList)
 
-# 空值转NULL && 根据SpecialColumns[::-1]倒序排序
+# 空值转NULL && 根据SpecialColumns[::-1]倒序排序 (已取消排序)
 primaryColumns = getPrimaryColumns(tableDFList_bak, joinedTable)
 foreignColumns = [i for i in joinedTable.columns.to_list() if i not in primaryColumns]
+joinedTable_ordered = joinedTable.fillna(value="NULL")[list(primaryColumns+foreignColumns)]
+'''
 if len(foreignColumns) != 0:
     joinedTable_ordered = joinedTable.fillna(value="NULL").sort_values(by=foreignColumns[::-1], ascending=False).reset_index(drop=True)[list(primaryColumns+foreignColumns)]
 else:
     joinedTable_ordered = joinedTable.fillna(value="NULL")[list(primaryColumns+foreignColumns)]
+'''
 
 # 生成每个表以及最终表的统计信息
 statisticInfo = originalTbalesStatistic(tableDFList_bak, joinedTable_ordered) + '\n\n' + joinedTableStatistic(joinedTable_ordered)
